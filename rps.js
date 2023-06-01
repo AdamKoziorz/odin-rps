@@ -1,11 +1,36 @@
 // Rock Paper Scissors
-// Javascript Implementation
+// Javascript Implementation (part 2)
 // Adam Koziorz
 
 const ROCK = "Rock";
 const PAPER = "Paper";
 const SCISSORS = "Scissors";
 const WIN_CONDITION = 5;
+USER_WIN_COUNT = 0;         // Bad style to have mutable global variables, but good enough for
+COM_WIN_COUNT = 0;          // the purpose of this program (this is DOM manipulation practice)
+
+// Create references to what we want to manipulate in the DOM
+const buttons = document.querySelectorAll('button');
+const resultdiv = document.querySelector('.results');
+
+
+// Adds listeners to the button to allow for gameplay
+function addButtonListeners() {
+  buttons.forEach((button) => {
+    button.addEventListener('click', () => {
+      playRound(button.id);
+    });
+  });
+}
+ 
+
+// Disables all of the buttons - used once the game ends
+// (buttons are enabled by default)
+function disableButtons() {
+  buttons.forEach((button) => {
+    button.disabled = true;
+  });
+}
 
 
 // Returns the computer's choice (randomized)
@@ -14,69 +39,57 @@ function getComputerChoice() {
 }
 
 
-// Return the user's choice after asking the user
-function getPlayerChoice() {
-  let userInput = prompt("Rock, Paper, or Scissors?");
-  userInput = userInput ? userInput.trim().toLowerCase() : "";
-  
-  switch (userInput) {
-    case "rock":
-      return ROCK;
-    case "paper":
-      return PAPER;
-    case "scissors":
-      return SCISSORS;
-    default:
-      console.log("Invalid option. Defaulting to Rock...");
-      return ROCK;
+// Checks to see if the win conditions have been met
+// If it has been met, we print the winner to the user and disable the buttons to indicate
+// that the game has ended. Our logic is set up so that the user has to refresh the page to
+// play another game, and it could be modified to remove this requirement
+function checkWin() {
+  if (USER_WIN_COUNT === WIN_CONDITION) {
+    printMsg("You won the game :)");
+    disableButtons();
+  } else if (COM_WIN_COUNT === WIN_CONDITION) {
+    printMsg("You lost the game :(");
+    disableButtons();
   }
 }
 
 
 // Returns a value indicating the result of the selections
 // 0 - Draw, 1 - Win, 2 - Lose
-function playRound(playerSelection, computerSelection) {
+function playRound(playerSelection) {
+  const computerSelection = getComputerChoice();
+
   if (playerSelection === computerSelection) {
-    return 0;
+    printMsg("Draw!");
   } else if ((playerSelection === ROCK && computerSelection === SCISSORS) ||
              (playerSelection === PAPER && computerSelection === ROCK) ||
              (playerSelection === SCISSORS && computerSelection === PAPER)) {
-    return 1;
+    USER_WIN_COUNT++;
+    printMsg("You win! " + playerSelection + " beats " + computerSelection + "!");
   } else {
-    return 2;
+    COM_WIN_COUNT++;
+    printMsg("You lose! " + computerSelection + " beats " + playerSelection + "!");
   }
+  printScore();
+  checkWin();
 }
 
 
-// Initializes a game of Rock, Paper, Scissors
-// We track the wins the player and computers both have, and call
-// playRound() until one reaches five wins (thus ending the game
-// with that person winning)
-function game() {
-  let playerCount = 0;
-  let computerCount = 0;
-
-  while (playerCount !== WIN_CONDITION && computerCount !== WIN_CONDITION) {
-    const playerSelection = getPlayerChoice();
-    const computerSelection = getComputerChoice();
-    const retval = playRound(playerSelection, computerSelection);
-
-    if (retval === 1) {
-      playerCount++;
-      console.log("You win! " + playerSelection + " beats " + computerSelection + "!");
-    } else if (retval === 2) {
-      computerCount++;
-      console.log("You lose! " + computerSelection + " beats " + playerSelection + "!");
-    } else {
-      console.log("Draw!");
-    }
-  }
-
-  if (playerCount === WIN_CONDITION) {
-    console.log("You won the game :)");
-  } else {
-    console.log("You lost the game :(");
-  }
+// Prints the result to the screen (as opposed to the console before)
+function printMsg(message) {
+  const res = document.createElement('h3');
+  res.textContent = message;
+  resultdiv.appendChild(res);
 }
 
-game();
+
+// Prints the score of the game
+function printScore() {
+  const res = document.createElement('p');
+  res.textContent = `The score is now ${USER_WIN_COUNT}-${COM_WIN_COUNT} (U-C)`;
+  resultdiv.appendChild(res);
+}
+
+
+// These listeners serve as our "entry point" to the rest of the program
+addButtonListeners();

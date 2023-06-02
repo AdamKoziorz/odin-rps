@@ -1,3 +1,3 @@
 # odin-rps
 
-I am completing various small projects as part of the Odin Project. "Rock Paper Scissors" is the third project in the Foundations course, which tests basic JavaScript to create a console-only version of Rock Paper Scissors. This project will be revisited later on in the course!
+I am completing various small projects as part of the Odin Project. "Rock Paper Scissors" is the third project in the Foundations course, which tests basic JavaScript and DOM manipulation to create a game of Rock Paper Scissors. In the first phase of this project, only a console version of Rock Paper Scissors was implemented, while in the second and final phase, a very basic UI was implemented.

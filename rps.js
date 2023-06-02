@@ -6,8 +6,10 @@ const ROCK = "Rock";
 const PAPER = "Paper";
 const SCISSORS = "Scissors";
 const WIN_CONDITION = 5;
-USER_WIN_COUNT = 0;         // Bad style to have mutable global variables, but good enough for
-COM_WIN_COUNT = 0;          // the purpose of this program (this is DOM manipulation practice)
+userWinCount = 0;         // Bad style to have mutable global variables, but good enough for
+comWinCount = 0;          // the purpose of this program (this is DOM manipulation practice)
+started = false;
+ended = false;
 
 // Create references to what we want to manipulate in the DOM
 const buttons = document.querySelectorAll('button');
@@ -44,12 +46,14 @@ function getComputerChoice() {
 // that the game has ended. Our logic is set up so that the user has to refresh the page to
 // play another game, and it could be modified to remove this requirement
 function checkWin() {
-  if (USER_WIN_COUNT === WIN_CONDITION) {
-    printMsg("You won the game :)");
+  if (userWinCount === WIN_CONDITION || comWinCount === WIN_CONDITION) {
     disableButtons();
-  } else if (COM_WIN_COUNT === WIN_CONDITION) {
-    printMsg("You lost the game :(");
-    disableButtons();
+    ended = true;
+    if (userWinCount === WIN_CONDITION) {
+      printMsg("You won the game :)");
+    } else if (comWinCount === WIN_CONDITION) {
+      printMsg("You lost the game :(");
+    }
   }
 }
 
@@ -64,30 +68,46 @@ function playRound(playerSelection) {
   } else if ((playerSelection === ROCK && computerSelection === SCISSORS) ||
              (playerSelection === PAPER && computerSelection === ROCK) ||
              (playerSelection === SCISSORS && computerSelection === PAPER)) {
-    USER_WIN_COUNT++;
+    userWinCount++;
     printMsg("You win! " + playerSelection + " beats " + computerSelection + "!");
   } else {
-    COM_WIN_COUNT++;
+    comWinCount++;
     printMsg("You lose! " + computerSelection + " beats " + playerSelection + "!");
   }
   printScore();
   checkWin();
+
+  if (!started) {
+    started = true;
+  }
 }
 
 
 // Prints the result to the screen (as opposed to the console before)
 function printMsg(message) {
-  const res = document.createElement('h3');
-  res.textContent = message;
-  resultdiv.appendChild(res);
+  if (!started || ended) {
+    const res = document.createElement('h3');
+    res.classList.add("result");
+    res.textContent = message;
+    resultdiv.appendChild(res);
+  } else {
+    const res = document.querySelector('.result');
+    res.textContent = message;
+  }
 }
 
 
 // Prints the score of the game
 function printScore() {
-  const res = document.createElement('p');
-  res.textContent = `The score is now ${USER_WIN_COUNT}-${COM_WIN_COUNT} (U-C)`;
-  resultdiv.appendChild(res);
+  if (!started) {
+    const res = document.createElement('p');
+    res.classList.add("score");
+    res.textContent = `The score is now ${userWinCount}-${comWinCount} (U-C)`;
+    resultdiv.appendChild(res);
+  } else {
+    const res = document.querySelector('.score');
+    res.textContent = `The score is now ${userWinCount}-${comWinCount} (U-C)`;
+  }
 }
 
 
